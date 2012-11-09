@@ -29,11 +29,12 @@
 	};
 
 	blaze.View.prototype._mouseClick = function(event) {
-		if (this.model.waterLevel > 0) {
+		if (Math.floor(this.model.waterLevel) > 0) {
 			var x = this.getCellXCoordinate(event);
 			var y = this.getCellYCoordinate(event);
 			this.model.forestArray[x][y].watered = true;
 			this.model.forestArray[x][y].percentBurned = 0;
+			this.model.forestArray[x][y].flammable = false;
 			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
 			if (this.model.waterLevel < 0) {
 				this.model.waterLevel = 0;
