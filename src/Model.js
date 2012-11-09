@@ -33,15 +33,14 @@
 	};
 
 	blaze.Model.prototype.isBurning = function() {
-		/*for (var x = 0; x < this.getGridSize(); x++) {
+		for (var x = 0; x < this.getGridSize(); x++) {
 			for (var y = 0; y < this.getGridSize(); y++) {
 				if(this.forestArray[x][y].percentBurned > 0 && this.forestArray[x][y].percentBurned < 1) {
 					return true;
 				}
 			}
-		}*/
-		//return false;
-		return true;
+		}
+		return false;
 	};
 
 	blaze.Model.prototype.step = function() {
@@ -69,7 +68,7 @@
 				}
 			}
 		}
-	}
+	};
 
 	blaze.Square = function(x, y) {
 		this.getX = _.constant(x);
