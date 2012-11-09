@@ -10,13 +10,13 @@
 		var setup = {
 			gridSize: 50,
 			//probability of a tree burning if an adjacent tree is burning
-			flamability: 0.025,
+			flammability: 0.025,
 			//1/burnRate = # of steps for trees to burn completely
 			burnRate: 0.0025,
 			//number of times water can be droppped
 			waterTankSize: 30,
 			//porbabilty of a square being flammable when the game starts
-			precentGreen: 0.5
+			percentGreen: 0.5
 		};
 		//#of millis to delay between steps
 		this.stepDelay = 50;
@@ -34,11 +34,11 @@
 
 		//disable double click selection
 		$(document).bind('mousedown.disableTextSelect', function() {
-	    	return false;
-	    });
-
-	    //initialize
-	    this.model.restart();
+			return false;
+		});
+		
+		//initialize
+		this.model.restart();
 		this.view.update();
 	};
 

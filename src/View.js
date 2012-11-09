@@ -32,8 +32,9 @@
 		if (this.model.waterLevel > 0) {
 			var x = this.getCellXCoordinate(event);
 			var y = this.getCellYCoordinate(event);
-			this.model.forestArray[x][y] = "blue";
-			this.model.waterLevel -= Math.floor(100 / this.model.getWaterTankSize());
+			this.model.forestArray[x][y].watered = true;
+			this.model.forestArray[x][y].percentBurned = 0;
+			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
 			if (this.model.waterLevel < 0) {
 				this.model.waterLevel = 0;
 			}
@@ -69,21 +70,32 @@
 	};
 
 	blaze.View.prototype.update = function() {
-		
-		$("#water .value").text(this.model.waterLevel);
 		var treesBurned = 0;
 
 		for (var x = 0; x < this.model.getGridSize(); x++) {
 			for (var y = 0; y <= this.model.getGridSize(); y++) {
-				var color = this.model.forestArray[x][y]
-				if (color === "red" || color === "gray") {
+				var color = "#703300";
+				if (this.model.forestArray[x][y].watered === true) {
+					color = "blue";
+				}
+				else if (this.model.forestArray[x][y].flammable === true) {
+					color = "green";
+				}
+				else if (this.model.forestArray[x][y].percentBurned > 0) {
 					treesBurned++;
+					if (this.model.forestArray[x][y].percentBurned === 1) {
+						color = "gray";
+					}
+					else {
+						color = "red";
+					}
 				}
 				this.ctx.fillStyle = color;
 				this.ctx.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
 			}
 		}
-		treesBurned = Math.floor(treesBurned / this.model.trees);
+		$("#water .value").text(Math.floor(this.model.waterLevel));
+		treesBurned = Math.floor((treesBurned / this.model.trees) * 100);
 		$("#burned .value").text(treesBurned);
 	};
 }());
