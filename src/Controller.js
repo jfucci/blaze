@@ -1,6 +1,6 @@
-/*global $:true, document:true, blaze:true */
-(function () {
-    "use strict";
+/*global $:true, document:true, blaze:true, _:true, window:true*/
+(function() {
+	"use strict";
 
 	$(document).ready(function() {
 		new blaze.Controller();
@@ -20,14 +20,14 @@
 		};
 		//#of millis to delay between steps
 		this.stepDelay = 50;
-		
+
 		this.model = new blaze.Model(setup);
 		this.view = new blaze.View(this.model);
 		this.interval = null;
 
 		$('#restart').click(_.bind(function() {
 			this.model.restart();
-			if(this.interval === null){
+			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
 		}, this));
@@ -36,7 +36,7 @@
 		$(document).bind('mousedown.disableTextSelect', function() {
 			return false;
 		});
-		
+
 		//initialize
 		this.model.restart();
 		this.view.update();
@@ -45,7 +45,7 @@
 	blaze.Controller.prototype.step = function() {
 		this.model.step();
 		this.view.update();
-		if(!this.model.isBurning()){
+		if(!this.model.isBurning()) {
 			window.clearInterval(this.interval);
 			this.interval = null;
 		}
