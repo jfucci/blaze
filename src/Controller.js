@@ -44,12 +44,12 @@
 
 	blaze.Controller.prototype.step = function() {
 		this.model.step();
-		this.view.update();
 		if(!this.model.isBurning) {
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = [];
 		}
+		this.view.update();
 	};
 
 }());
