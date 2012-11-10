@@ -1,3 +1,5 @@
+/*global _:true*/
+
 (function() {
     "use strict";
 
@@ -5,7 +7,7 @@
 
     utils.product = function(sets) {
         var product2 = function(memos, set) {
-                ret = _.map(memos, function(memo) {
+                var ret = _.map(memos, function(memo) {
                     return _.map(set, function(element) {
                         return memo.concat(element);
                     });
