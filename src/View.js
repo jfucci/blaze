@@ -50,11 +50,9 @@
 		var x = this.getCellXCoordinate(event);
 		var y = this.getCellYCoordinate(event);
 		this.model.copterSquare = [x, y];
-		this.update();
 	};
 	blaze.View.prototype._mouseLeave = function() {
 		this.model.copterSquare = [];
-		this.update();
 	};
 
 	blaze.View.prototype.getCellXCoordinate = function(event) {
