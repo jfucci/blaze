@@ -48,6 +48,7 @@
 		if(!this.model.isBurning) {
 			window.clearInterval(this.interval);
 			this.interval = null;
+			this.model.copterSquare = [];
 		}
 	};
 
