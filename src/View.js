@@ -85,7 +85,12 @@
 				color = "yellow";
 			}
 			else if (square.watered === true) {
-				color = "blue";
+				if(square.isATree) {
+					color = "#3333FF";
+				}
+				else {
+					color = "blue";
+				}
 			}
 			else if (square.flammable === true) {
 				color = "green";
