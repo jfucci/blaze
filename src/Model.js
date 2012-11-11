@@ -13,27 +13,44 @@
 		var coordinates = _.product(_.repeat(_.range(this.getGridSize()), 2));
 		this.forestArray = {};
 		_.each(coordinates, function(coordinate) {
-			this.forestArray[coordinate] = new blaze.Square(coordinate[0], coordinate[1]);
+			this.forestArray[coordinate] = new blaze.Square(coordinate[0], coordinate[1], this.getGridSize());
 		}, this);
-
 	};
 
 	blaze.Model.prototype.restart = function() {
 		this.copterSquare = [];
 		this.isBurning = true;
 		this.waterLevel = 100;
+	};
+
+	blaze.Model.prototype.resetTrees = function() {
+		_.each(this.forestArray, function(square) {
+			square.setup(false);
+			if(square.isATree) {
+				this.growTree(square);
+			}
+		}, this);
+	};
+
+	blaze.Model.prototype.newBoard = function() {
+		this.restart();
 		this.trees = 0;
 		_.each(this.forestArray, function(square) {
-			square.setup(this.getGridSize());
+			square.setup(true);
 			if(Math.random() > this.getPercentGreen()) {
+					square.isATree = true;
 					this.trees++;
-					if(square.getX() === 0) {
-						square.percentBurned += this.getBurnRate();
-					} else {
-						square.flammable = true;
-					}
+					this.growTree(square);
 				}
 		}, this);
+	};
+
+	blaze.Model.prototype.growTree = function(square) {
+		if(square.getX() === 0) {
+			square.percentBurned += this.getBurnRate();
+		} else {
+			square.flammable = true;
+		}
 	};
 
 	blaze.Model.prototype.step = function() {
@@ -56,15 +73,9 @@
 		}, this);
 	};
 
-	blaze.Square = function(x, y) {
+	blaze.Square = function(x, y, gridSize) {
 		this.getX = _.constant(x);
 		this.getY = _.constant(y);
-	};
-
-	blaze.Square.prototype.setup = function(gridSize) {
-		this.flammable     = false;
-		this.percentBurned = 0;
-		this.watered       = false;
 		this.neighbors = [];
 		for(var xx = this.getX() - 1; xx <= this.getX() + 1; xx++) {
 			for(var yy = this.getY() - 1; yy <= this.getY() + 1; yy++) {
@@ -72,6 +83,15 @@
 					this.neighbors.push([xx, yy]);
 				}
 			}
+		}
+	};
+
+	blaze.Square.prototype.setup = function(newBoard) {
+		this.flammable     = false;
+		this.percentBurned = 0;
+		this.watered       = false;
+		if(newBoard) {
+			this.isATree = false;
 		}
 	};
 }());
