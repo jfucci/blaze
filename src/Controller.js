@@ -27,7 +27,16 @@
 
 		$('#restart').click(_.bind(function() {
 			this.model.restart();
+			this.model.resetTrees();
 			if(this.interval === null) {
+				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
+			}
+		}, this));
+
+
+		$('#newBoard').click(_.bind(function() {
+			this.model.newBoard();
+			if(this.interval === null){
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
 		}, this));
@@ -38,7 +47,7 @@
 		});
 
 		//initialize
-		this.model.restart();
+		this.model.newBoard();
 		this.view.update();
 	};
 
