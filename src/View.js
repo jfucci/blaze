@@ -80,7 +80,7 @@
 
 		_.each(this.model.forestArray, function(square) {
 			var color = "#703300";
-			if(square.getX() === this.model.copterSquare[] && square.getY() === this.model.copterSquare[1]) {
+			if(square.getX() === this.model.copterSquare[0] && square.getY() === this.model.copterSquare[1]) {
 				color = "yellow";
 			} else if(square.watered === true) {
 				if(square.isATree) {
