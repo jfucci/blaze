@@ -1,6 +1,6 @@
 /*global _:true, blaze:true, $:true */
-(function () {
-    "use strict";
+(function() {
+	"use strict";
 
 	blaze.View = function(model) {
 		this.model = model;
@@ -29,17 +29,15 @@
 	};
 
 	blaze.View.prototype._mouseClick = function(event) {
-		if (Math.floor(this.model.waterLevel) > 0) {
-			var x = this.getCellXCoordinate(event);
-			var y = this.getCellYCoordinate(event);
-
-			this.model.forestArray[[x, y]].watered       = true;
-			this.model.forestArray[[x, y]].percentBurned = 0;
-			this.model.forestArray[[x, y]].flammable     = false;
+		if(Math.floor(this.model.waterLevel) > 0) {
+			var square = this.model.forestArray[this.model.copterSquare];
+			square.watered = true;
+			square.percentBurned = 0;
+			square.flammable = false;
 
 			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
-			
-			if (this.model.waterLevel < 0) {
+
+			if(this.model.waterLevel < 0) {
 				this.model.waterLevel = 0;
 			}
 			this.update();
@@ -78,42 +76,37 @@
 	blaze.View.prototype.update = function() {
 		var treesBurned = 0;
 		var treesCompletelyBurned = 0;
+		var displayCellSize = this.cellSize + this.pixel;
 
 		_.each(this.model.forestArray, function(square) {
 			var color = "#703300";
-			if(square.getX() === this.model.copterSquare[0] && square.getY() === this.model.copterSquare[1]) {
+			if(square.getX() === this.model.copterSquare[] && square.getY() === this.model.copterSquare[1]) {
 				color = "yellow";
-			}
-			else if (square.watered === true) {
+			} else if(square.watered === true) {
 				if(square.isATree) {
 					color = "#3333FF";
-				}
-				else {
+				} else {
 					color = "blue";
 				}
-			}
-			else if (square.flammable === true) {
+			} else if(square.flammable === true) {
 				color = "green";
-			}
-			else if (square.percentBurned > 0) {
+			} else if(square.percentBurned > 0) {
 				treesBurned++;
-				if (square.percentBurned === 1) {
+				if(square.percentBurned === 1) {
 					treesCompletelyBurned++;
 					color = "gray";
-				}
-				else {
+				} else {
 					color = "red";
 				}
 			}
 			this.ctx.fillStyle = color;
-			this.ctx.fillRect(square.getX() * this.cellSize, square.getY() * this.cellSize,
-				this.cellSize + this.pixel, this.cellSize + this.pixel);
+			this.ctx.fillRect(square.getX() * this.cellSize, square.getY() * this.cellSize, displayCellSize, displayCellSize);
 		}, this);
 
 		if(treesCompletelyBurned === treesBurned) {
 			this.model.isBurning = false;
 		}
-		
+
 		$("#water .value").text(Math.floor(this.model.waterLevel));
 		treesBurned = Math.floor((treesBurned / this.model.trees) * 100);
 		$("#burned .value").text(treesBurned);
