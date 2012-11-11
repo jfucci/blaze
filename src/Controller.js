@@ -24,6 +24,7 @@
 		this.model = new blaze.Model(setup);
 		this.view = new blaze.View(this.model);
 		this.interval = null;
+		this.tries = 0;
 
 		$('#restart').click(_.bind(function() {
 			this.model.restart();
@@ -31,6 +32,7 @@
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
+			$("#tries .value").text(++this.tries);
 		}, this));
 
 
@@ -39,6 +41,7 @@
 			if(this.interval === null){
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
+			$("#tries .value").text(this.tries = 1);
 		}, this));
 
 		//disable double click selection
