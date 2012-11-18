@@ -125,12 +125,12 @@
 						treesCompletelyBurned++;
 						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= .5) {
-						color = "rgb(" + Math.round((-.5*Math.pow(2*square.percentBurned-1, 3) + 1) * 256) 
-							+ "," + Math.round(.5*(Math.pow((2*square.percentBurned-1), 3)) * 256) 
-							+ "," + Math.round(.5*(Math.pow((2*square.percentBurned-1), 3)) * 256) + ")";
+						color = "rgb(" + Math.round(((-.5*Math.pow(2*square.percentBurned-1, 3) + 1) + (Math.random()-.5) * .2) * 256)
+							+ "," + Math.round((.5*(Math.pow((2*square.percentBurned-1), 3)) + (Math.random()-.5) * .2) * 256) 
+							+ "," + Math.round((.5*(Math.pow((2*square.percentBurned-1), 3)) + (Math.random()-.5) * .2) * 256) + ")";
 					} else {
-						color = "rgb(" + Math.round((.5*Math.pow(2*square.percentBurned-1, 3) + .5) * 510) 
-							+ "," + Math.round(-.5*(Math.pow((2*square.percentBurned-1), 3)) * 256) + ",0)";
+						color = "rgb(" + Math.round(((.5*Math.pow(2*square.percentBurned-1, 3) + .5) + (Math.random()-.5) * .2) * 510) 
+							+ "," + Math.round((-.5*(Math.pow((2*square.percentBurned-1), 3)) + (Math.random()-.5) * .2) * 256) + ",0)";
 					}
 				}
 				if(this.model.inverted) {
