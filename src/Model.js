@@ -16,7 +16,7 @@
 		_.each(coordinates, function(coordinate) {
 			this.forestArray[coordinate] = new blaze.SmallForest(coordinate[0], coordinate[1], this.smallForestWidth, this.smallForestNum, setup);
 		}, this);
-
+		this.inverted = false;
 	};
 
 	blaze.Model.prototype.step = function() {

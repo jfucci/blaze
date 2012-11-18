@@ -51,6 +51,7 @@
 		var y = this.getCellYCoordinate(event);
 		this.model.copterSquare = [forestX, forestY, x, y];
 	};
+
 	blaze.View.prototype._mouseLeave = function() {
 		this.model.copterSquare = [];
 	};
@@ -106,26 +107,29 @@
 		_.each(this.model.forestArray, function(smallForest) {
 			trees += smallForest.trees;
 			_.each(smallForest.squares, function(square) {
-				var color = "#703300";
+				var color = "rgb(112,51,0)";
 				if(smallForest.x === this.model.copterSquare[0] && smallForest.y === this.model.copterSquare[1] 
 					&& square.getX() === this.model.copterSquare[2] && square.getY() === this.model.copterSquare[3]) {
-					color = "yellow";
+					color = "rgb(255,255,0)";
 				} else if(square.watered === true) {
 					if(square.isATree) {
-						color = "#3333FF";
+						color = "rgb(51,51,255)";
 					} else {
-						color = "blue";
+						color = "rgb(0,0,255)";
 					}
 				} else if(square.flammable === true) {
-					color = "green";
+					color = "rgb(0,128,0)";
 				} else if(square.percentBurned > 0) {
 					treesBurned++;
 					if(square.percentBurned === 1) {
 						treesCompletelyBurned++;
-						color = "gray";
+						color = "rgb(128,128,128)";
 					} else {
-						color = "red";
+						color = "rgb(255,0,0)";
 					}
+				}
+				if(this.model.inverted) {
+					color = this.invertColor(color);
 				}
 				this.ctx.fillStyle = color;
 				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.x * (1/ this.model.smallForestNum), 
@@ -142,4 +146,15 @@
 		treesBurned = Math.floor((treesBurned / trees) * 100);
 		$("#burned .value").text(treesBurned);
 	};
+
+	blaze.View.prototype.invertColor = function(color) {
+		var oldColor = color.split('(')[1].split(')')[0].split(','); 
+		var invertedColor = []; 
+		for(var iii = 0; iii < oldColor.length; iii++){ 
+			invertedColor[iii] = 255 - Number(oldColor[iii]); 
+		}
+		color = "rgb(" + invertedColor[0] + "," + invertedColor[1] + "," + invertedColor[2] + ")";
+		return color;
+	} 
+
 }());

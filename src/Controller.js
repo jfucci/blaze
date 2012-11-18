@@ -43,6 +43,11 @@
 			$("#tries .value").text(this.tries = 1);
 		}, this));
 
+		$('#invert').click(_.bind(function() {
+			this.model.inverted = !this.model.inverted;
+			this.view.update();
+		}, this));
+
 		//disable double click selection
 		$(document).bind('mousedown.disableTextSelect', function() {
 			return false;
