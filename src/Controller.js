@@ -28,7 +28,6 @@
 
 		$('#restart').click(_.bind(function() {
 			this.model.restart();
-			this.model.resetTrees();
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
@@ -56,7 +55,7 @@
 
 	blaze.Controller.prototype.step = function() {
 		this.model.step();
-		if(!this.model.isBurning) {
+		if(!this.model.isBurning){
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = [];

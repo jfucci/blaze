@@ -28,9 +28,9 @@
 		this.cellSize = 1 / this.model.getGridSize();
 	};
 
-	blaze.View.prototype._mouseClick = function(event) {
+	blaze.View.prototype._mouseClick = function() {
 		if(Math.floor(this.model.waterLevel) > 0) {
-			var square = this.model.forestArray[this.model.copterSquare];
+			var square = this.model.forestArray[this.model.copterSquare[0]+ "," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
 			square.watered = true;
 			square.percentBurned = 0;
 			square.flammable = false;
@@ -45,9 +45,11 @@
 	};
 
 	blaze.View.prototype._mouseMove = function(event) {
+		var forestX = this.getSmForestXCoordinate(event);
+		var forestY = this.getSmForestYCoordinate(event);
 		var x = this.getCellXCoordinate(event);
 		var y = this.getCellYCoordinate(event);
-		this.model.copterSquare = [x, y];
+		this.model.copterSquare = [forestX, forestY, x, y];
 	};
 	blaze.View.prototype._mouseLeave = function() {
 		this.model.copterSquare = [];
@@ -58,7 +60,7 @@
 		var x = 0;
 		if(pixelX < this.canvas.width() && pixelX > 0) {
 			var cellWidthInPixels = this.canvas.width() * this.cellSize;
-			x = Math.floor(pixelX / cellWidthInPixels); //find the x index of the cell
+			x = Math.floor(pixelX / cellWidthInPixels) % this.model.smallForestWidth; //find the x index of the cell
 		}
 		return x;
 	};
@@ -68,39 +70,68 @@
 		var y = 0;
 		if(pixelY < this.canvas.height() && pixelY > 0) {
 			var cellHeightInPixels = this.canvas.height() * this.cellSize;
-			y = Math.floor(pixelY / cellHeightInPixels); //find the y index of the cell
+			y = Math.floor(pixelY / cellHeightInPixels) % this.model.smallForestWidth; //find the y index of the cell
+		}
+		return y;
+	};
+
+	blaze.View.prototype.getSmForestXCoordinate = function(event) {
+		var pixelX = event.pageX - this.canvas.offset().left;
+		var x = 0;
+		if(pixelX < this.canvas.width() && pixelX > 0) {
+			var smallForestWidthInPixels = this.canvas.width() * (1 / this.model.smallForestNum);
+			x = Math.floor(pixelX / smallForestWidthInPixels); //find the x index of the smForest
+		}
+		return x;
+	};
+
+	blaze.View.prototype.getSmForestYCoordinate = function(event) {
+		var pixelY = event.pageY - this.canvas.offset().top;
+		var y = 0;
+		if(pixelY < this.canvas.height() && pixelY > 0) {
+			var smallForestHeightInPixels = this.canvas.height() * (1 / this.model.smallForestNum);
+			y = Math.floor(pixelY / smallForestHeightInPixels); //find the y index of the smForest
 		}
 		return y;
 	};
 
 	blaze.View.prototype.update = function() {
 		var treesBurned = 0;
+		var trees = 0;
 		var treesCompletelyBurned = 0;
 		var displayCellSize = this.cellSize + this.pixel;
 
-		_.each(this.model.forestArray, function(square) {
-			var color = "#703300";
-			if(square.getX() === this.model.copterSquare[0] && square.getY() === this.model.copterSquare[1]) {
-				color = "yellow";
-			} else if(square.watered === true) {
-				if(square.isATree) {
-					color = "#3333FF";
-				} else {
-					color = "blue";
+		//equation for color change: .5(2x-1)^3 + .5
+
+		_.each(this.model.forestArray, function(smallForest) {
+			trees += smallForest.trees;
+			_.each(smallForest.squares, function(square) {
+				var color = "#703300";
+				if(smallForest.x === this.model.copterSquare[0] && smallForest.y === this.model.copterSquare[1] 
+					&& square.getX() === this.model.copterSquare[2] && square.getY() === this.model.copterSquare[3]) {
+					color = "yellow";
+				} else if(square.watered === true) {
+					if(square.isATree) {
+						color = "#3333FF";
+					} else {
+						color = "blue";
+					}
+				} else if(square.flammable === true) {
+					color = "green";
+				} else if(square.percentBurned > 0) {
+					treesBurned++;
+					if(square.percentBurned === 1) {
+						treesCompletelyBurned++;
+						color = "gray";
+					} else {
+						color = "red";
+					}
 				}
-			} else if(square.flammable === true) {
-				color = "green";
-			} else if(square.percentBurned > 0) {
-				treesBurned++;
-				if(square.percentBurned === 1) {
-					treesCompletelyBurned++;
-					color = "gray";
-				} else {
-					color = "red";
-				}
-			}
-			this.ctx.fillStyle = color;
-			this.ctx.fillRect(square.getX() * this.cellSize, square.getY() * this.cellSize, displayCellSize, displayCellSize);
+				this.ctx.fillStyle = color;
+				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.x * (1/ this.model.smallForestNum), 
+					square.getY() * this.cellSize + (1/ this.model.smallForestNum) * smallForest.y, 
+					displayCellSize, displayCellSize);
+			}, this);
 		}, this);
 
 		if(treesCompletelyBurned === treesBurned) {
@@ -108,7 +139,7 @@
 		}
 
 		$("#water .value").text(Math.floor(this.model.waterLevel));
-		treesBurned = Math.floor((treesBurned / this.model.trees) * 100);
+		treesBurned = Math.floor((treesBurned / trees) * 100);
 		$("#burned .value").text(treesBurned);
 	};
 }());
