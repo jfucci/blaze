@@ -123,7 +123,7 @@
 					treesBurned++;
 					if(square.percentBurned >= 1) {
 						treesCompletelyBurned++;
-						color = rgb(128,128,128);
+						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= .5) {
 						color = "rgb(" + Math.round((-.5*Math.pow(2*square.percentBurned-1, 3) + 1) * 256) 
 							+ "," + Math.round(.5*(Math.pow((2*square.percentBurned-1), 3)) * 256) 
