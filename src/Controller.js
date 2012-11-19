@@ -16,7 +16,9 @@
 			//number of times water can be droppped
 			waterTankSize: 30,
 			//porbabilty of a square being flammable when the game starts
-			percentGreen: 0.5
+			percentGreen: 0.5,
+			//number of small forests horizonal in the forest array
+			smallForestNum: 10
 		};
 		//#of millis to delay between steps
 		this.stepDelay = 50;
@@ -27,7 +29,7 @@
 		this.tries = 0;
 
 		$('#restart').click(_.bind(function() {
-			this.model.restart();
+			this.model.resetForest();
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
