@@ -30,7 +30,8 @@
 
 	blaze.View.prototype._mouseClick = function() {
 		if(Math.floor(this.model.waterLevel) > 0) {
-			var square = this.model.forestArray[this.model.copterSquare[0]+ "," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
+			var square = this.model.forestArray[this.model.copterSquare[0]+ "," 
+				+ this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
 			square.watered = true;
 			square.percentBurned = 0;
 			square.flammable = false;
@@ -45,55 +46,33 @@
 	};
 
 	blaze.View.prototype._mouseMove = function(event) {
-		var forestX = this.getSmForestXCoordinate(event);
-		var forestY = this.getSmForestYCoordinate(event);
-		var x = this.getCellXCoordinate(event);
-		var y = this.getCellYCoordinate(event);
-		this.model.copterSquare = [forestX, forestY, x, y];
+		var smallForest = this.getCoordinates(event, "smallForest");
+		var mouse = this.getCoordinates(event, "cell");
+		this.model.copterSquare = [smallForest[0], smallForest[1], mouse[0], mouse[1]];
 	};
 
 	blaze.View.prototype._mouseLeave = function() {
 		this.model.copterSquare = [];
 	};
 
-	blaze.View.prototype.getCellXCoordinate = function(event) {
+	blaze.View.prototype.getCoordinates = function(event, area) {
 		var pixelX = event.pageX - this.canvas.offset().left;
-		var x = 0;
-		if(pixelX < this.canvas.width() && pixelX > 0) {
-			var cellWidthInPixels = this.canvas.width() * this.cellSize;
-			x = Math.floor(pixelX / cellWidthInPixels) % this.model.smallForestWidth; //find the x index of the cell
-		}
-		return x;
-	};
-
-	blaze.View.prototype.getCellYCoordinate = function(event) {
 		var pixelY = event.pageY - this.canvas.offset().top;
-		var y = 0;
-		if(pixelY < this.canvas.height() && pixelY > 0) {
-			var cellHeightInPixels = this.canvas.height() * this.cellSize;
-			y = Math.floor(pixelY / cellHeightInPixels) % this.model.smallForestWidth; //find the y index of the cell
-		}
-		return y;
-	};
-
-	blaze.View.prototype.getSmForestXCoordinate = function(event) {
-		var pixelX = event.pageX - this.canvas.offset().left;
 		var x = 0;
-		if(pixelX < this.canvas.width() && pixelX > 0) {
-			var smallForestWidthInPixels = this.canvas.width() * (1 / this.model.smallForestNum);
-			x = Math.floor(pixelX / smallForestWidthInPixels); //find the x index of the smForest
-		}
-		return x;
-	};
-
-	blaze.View.prototype.getSmForestYCoordinate = function(event) {
-		var pixelY = event.pageY - this.canvas.offset().top;
 		var y = 0;
-		if(pixelY < this.canvas.height() && pixelY > 0) {
-			var smallForestHeightInPixels = this.canvas.height() * (1 / this.model.smallForestNum);
-			y = Math.floor(pixelY / smallForestHeightInPixels); //find the y index of the smForest
+
+		if(pixelX < this.canvas.width() && pixelX > 0 && pixelY < this.canvas.height() && pixelY > 0) {
+			if(area === "cell") {
+				var cellSizeInPixels = this.canvas.width() * this.cellSize;
+				x = Math.floor(pixelX / cellSizeInPixels) % this.model.smallForestWidth;
+				y = Math.floor(pixelY / cellSizeInPixels) % this.model.smallForestWidth;
+			} else if(area === "smallForest") {
+				var smallForestSizeInPixels = this.canvas.width() * (1 / this.model.smallForestNum);
+				x = Math.floor(pixelX / smallForestSizeInPixels);
+				y = Math.floor(pixelY / smallForestSizeInPixels);
+			}
 		}
-		return y;
+		return [x, y];
 	};
 
 	blaze.View.prototype.update = function() {
@@ -101,8 +80,6 @@
 		var trees = 0;
 		var treesCompletelyBurned = 0;
 		var displayCellSize = this.cellSize + this.pixel;
-
-		//equation for color change: .5(2x-1)^3 + .5
 
 		_.each(this.model.forestArray, function(smallForest) {
 			trees += smallForest.trees;
