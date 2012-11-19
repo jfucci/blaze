@@ -110,7 +110,6 @@
 
 	blaze.SmallForest = function(x, y, width, num, setup) {
 		this.getGridSize      = _.constant(setup.gridSize);
-		this.getPercentGreen  = _.constant(setup.percentGreen);
 		this.getBurnRate      = _.constant(setup.burnRate);
 		this.density = Math.random();
 		this.trees = 0;
@@ -152,6 +151,7 @@
 	};
 
 	blaze.SmallForest.prototype.newForest = function() {
+		this.density = Math.random();
 		this.trees = 0;
 		_.each(this.squares, function(square) {
 			square.setup(true);
