@@ -9,6 +9,7 @@
 		this.getBurnRate       = _.constant(setup.burnRate);
 		this.getSmallForestNum = _.constant(setup.smallForestNum);
 		this.smallForestWidth  = this.getGridSize() / this.getSmallForestNum();
+		this.getFFNeighbors    = _.constant(setup.floodFillNeighbors);
 		this.trees             = 0;
 		this.isBurning         = false;
 		this.inverted          = false;

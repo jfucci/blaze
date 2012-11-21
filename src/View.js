@@ -35,7 +35,7 @@
 			
 			if(square.watered) {
 				var squares = [];
-				for(var iii = 0; iii <= 4; iii++) {
+				for(var iii = 0; iii <= this.model.getFFNeighbors(); iii++) {
 					squares[iii] = this.getRandomAdjTree(square);
 				}
 				_.each(squares, function(square) {

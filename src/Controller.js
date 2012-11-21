@@ -18,7 +18,9 @@
 			//porbabilty of a square being flammable when the game starts
 			percentGreen: 0.5,
 			//number of small forests horizonal in the forest array
-			smallForestNum: 10
+			smallForestNum: 10,
+			//number of neighbors that are filled when clicking on a watered square
+			floodFillNeighbors: 4
 		};
 		//#of millis to delay between steps
 		this.stepDelay = 50;
