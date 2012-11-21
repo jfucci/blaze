@@ -130,17 +130,12 @@
 						treesCompletelyBurned++;
 						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= 0.5) {
-						color = "rgb(" + Math.round(((-0.5 * Math.pow(2 * square.percentBurned - 1, 7) + 1) + 
-								(Math.random() - 0.5) * 0.2) * 256) + 
-							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
-								(Math.random() - 0.5) * 0.2) * 256) + 
-							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
-								(Math.random() - 0.5) * 0.2) * 256) + ")";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 256, -1, 1) + 
+							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + 
+							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + ")";
 					} else {
-						color = "rgb(" + Math.round(((0.5 * Math.pow(2 * square.percentBurned - 1, 7) + 0.5) + 
-							(Math.random() - 0.5) * 0.2) * 510) + 
-						"," + Math.round((-0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
-							(Math.random() - 0.5) * 0.2) * 256) + ",0)";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 510, 1, 0.5) + 
+							"," + this.getBurnColor(square.percentBurned, 256, -1, 0) + ",0)";
 					}
 				}
 				if(this.model.inverted) {
@@ -160,6 +155,10 @@
 		$("#water .value").text(Math.floor(this.model.waterLevel));
 		treesBurned = Math.floor((treesBurned / trees) * 100);
 		$("#burned .value").text(treesBurned);
+	};
+
+	blaze.View.prototype.getBurnColor = function(percentBurned, p1, p2, p3) {
+		return Math.round(p1*(p2*0.5*Math.pow(2*percentBurned-1, 7)+p3+(Math.random()-0.5)*0.3));
 	};
 
 	blaze.View.prototype.invertColor = function(color) {
