@@ -33,16 +33,42 @@
 			var square = this.model.forestArray[this.model.copterSquare[0] + 
 			"," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
 			
-			square.watered = true;
-			square.percentBurned = 0;
-			square.flammable = false;
-
+			if(square.watered) {
+				var squares = [];
+				for(var iii = 0; iii <= 4; iii++) {
+					squares[iii] = this.getRandomAdjTree(square);
+				}
+				_.each(squares, function(square) {
+					square.water();
+				}, this);
+			} else {
+				square.water();
+			}
+			
 			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
 
 			if(this.model.waterLevel < 0) {
 				this.model.waterLevel = 0;
 			}
 			this.update();
+		}
+	};
+
+	blaze.View.prototype.getRandomAdjTree = function(square) {
+		var neighbor = null;
+		var neighbors = square.neighbors;
+		if(_.any(neighbors, function(n){ return this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree; }, this)) {
+			while(true) {
+				neighbor = neighbors[Math.round(Math.random() * 8)];
+				if(neighbor) {
+					square = this.model.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
+					if(square.watered) {
+						neighbors = square.neighbors;
+					} else if(square.isATree) {
+						return square;
+					}
+				}
+			}	
 		}
 	};
 
