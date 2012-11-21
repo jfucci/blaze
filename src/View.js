@@ -130,16 +130,16 @@
 						treesCompletelyBurned++;
 						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= 0.5) {
-						color = "rgb(" + Math.round(((-0.5 * Math.pow(2 * square.percentBurned - 1, 3) + 1) + 
+						color = "rgb(" + Math.round(((-0.5 * Math.pow(2 * square.percentBurned - 1, 7) + 1) + 
 								(Math.random() - 0.5) * 0.2) * 256) + 
-							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 3)) + 
+							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
 								(Math.random() - 0.5) * 0.2) * 256) + 
-							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 3)) + 
+							"," + Math.round((0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
 								(Math.random() - 0.5) * 0.2) * 256) + ")";
 					} else {
-						color = "rgb(" + Math.round(((0.5 * Math.pow(2 * square.percentBurned - 1, 3) + 0.5) + 
+						color = "rgb(" + Math.round(((0.5 * Math.pow(2 * square.percentBurned - 1, 7) + 0.5) + 
 							(Math.random() - 0.5) * 0.2) * 510) + 
-						"," + Math.round((-0.5 * (Math.pow((2 * square.percentBurned - 1), 3)) + 
+						"," + Math.round((-0.5 * (Math.pow((2 * square.percentBurned - 1), 7)) + 
 							(Math.random() - 0.5) * 0.2) * 256) + ",0)";
 					}
 				}
