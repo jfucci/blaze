@@ -27,13 +27,19 @@
 		this.view = new blaze.View(this.model);
 		this.interval = null;
 		this.tries = 0;
+		this.seed = $("#seed").val();
 
 		$('#restart').click(_.bind(function() {
 			this.model.newBoard($("#seed").val());
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
-			$("#tries .value").text(++this.tries);
+			if($("#seed").val() === this.seed) {
+				$("#tries .value").text(++this.tries);
+			} else {
+				$("#tries .value").text(this.tries = 1);
+				this.seed = $("#seed").val();
+			}
 		}, this));
 
 
@@ -44,6 +50,7 @@
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
 			$("#tries .value").text(this.tries = 1);
+			this.seed = $("#seed").val();
 		}, this));
 
 		$('#invert').click(_.bind(function() {
