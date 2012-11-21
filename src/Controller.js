@@ -68,6 +68,7 @@
 		$("#nextLevel").hide();
 		$("#nextLevel").click(_.bind(function() {
 			$("#nextLevel").hide();
+
 		}, this));
 
 		//initialize
@@ -81,7 +82,9 @@
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = [];
-			$("#nextLevel").show();
+			if(this.model.checkWinner()) {
+				$("#nextLevel").show();	
+			}
 		}
 		this.view.update();
 	};
