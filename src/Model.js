@@ -14,7 +14,6 @@
 		this.inverted          = false;
 		var coordinates        = _.product(_.repeat(_.range(this.getSmallForestNum()), 2));
 		this.forestArray       = {};
-
 		_.each(coordinates, function(coordinate) {
 			this.forestArray[coordinate] = new blaze.SmallForest(coordinate[0], coordinate[1], this);
 		}, this);
@@ -34,24 +33,19 @@
 		}, this);
 	};
 
-	blaze.Model.prototype.newBoard = function() {
+	blaze.Model.prototype.newBoard = function(seed) {
+		Math.seedrandom(seed);
 		this.restart();
 		_.each(this.forestArray, function(smallForest) {
 			smallForest.newForest();
 		}, this);
+		Math.seedrandom();
 	};
 
 	blaze.Model.prototype.restart = function() {
 		this.copterSquare = [];
 		this.isBurning    = true;
 		this.waterLevel   = 100;
-	};
-
-	blaze.Model.prototype.resetForest = function() {
-		this.restart();
-		_.each(this.forestArray, function(smallForest) {
-			smallForest.resetTrees();
-		}, this);
 	};
 
 	blaze.Model.prototype.burn = function(square) {
@@ -111,38 +105,31 @@
 		}
 	};
 
-	blaze.Square.prototype.setup = function(newBoard) {
+	blaze.Square.prototype.water = function() {
+		this.watered = true;
+		this.percentBurned = 0;
+		this.flammable = false;
+	};
+
+	blaze.Square.prototype.setup = function() {
 		this.flammable = false;
 		this.percentBurned = 0;
 		this.watered = false;
-		if(newBoard) {
-			this.isATree = false;
-		}
+		this.isATree = false;
 	};
-
 
 	blaze.SmallForest = function(x, y, model) {
 		this.model = model;
 		this.getX = _.constant(x);
 		this.getY = _.constant(y);
-		this.density = Math.random();
+		this.density = 0.5;
 		this.trees = 0;
 		var coordinates = _.product(_.repeat(_.range(this.model.smallForestWidth), 2));
 		this.squares = {};
 		_.each(coordinates, function(coordinate) {
 			this.squares[coordinate] = new blaze.Square(coordinate[0], coordinate[1], this.getX(), this.getY(), this.model.smallForestWidth, this.model.getSmallForestNum());
 		}, this);
-		this.grow();
-	};
-
-	blaze.SmallForest.prototype.grow = function() {
-		_.each(this.squares, function(square) {
-			if(Math.random() < this.density) {
-				square.isATree = true;
-				this.trees++;
-				this.growTree(square);
-			}
-		}, this);
+		this.newForest();
 	};
 
 	blaze.SmallForest.prototype.growTree = function(square) {
@@ -153,20 +140,10 @@
 		}
 	};
 
-	blaze.SmallForest.prototype.resetTrees = function() {
-		_.each(this.squares, function(square) {
-			square.setup(false);
-			if(square.isATree) {
-				this.growTree(square);
-			}
-		}, this);
-	};
-
 	blaze.SmallForest.prototype.newForest = function() {
-		this.density = Math.random();
 		this.trees = 0;
 		_.each(this.squares, function(square) {
-			square.setup(true);
+			square.setup();
 			if(Math.random() < this.density) {
 				square.isATree = true;
 				this.trees++;
