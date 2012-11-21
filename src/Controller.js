@@ -46,7 +46,7 @@
 
 
 		$('#newBoard').click(_.bind(function() {
-			$("#seed").val(Math.random() + "");
+			$("#seed").val(Math.pow(10e+17, Math.random()) + "");
 			this.model.newBoard($("#seed").val());
 			if(this.interval === null){
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
@@ -65,6 +65,11 @@
 			return false;
 		});
 
+		$("#nextLevel").hide();
+		$("#nextLevel").click(_.bind(function() {
+			$("#nextLevel").hide();
+		}, this));
+
 		//initialize
 		this.model.newBoard($("#seed").val());
 		this.view.update();
@@ -76,9 +81,7 @@
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = [];
-			if(this.model.checkWinner()) {
-				alert("you win!");
-			}
+			$("#nextLevel").show();
 		}
 		this.view.update();
 	};
