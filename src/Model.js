@@ -58,6 +58,15 @@
 		}, this);
 	};
 
+	blaze.Model.prototype.checkWinner = function() {
+		return !(_.any(this.forestArray, function(smallForest) {
+			return _.any(smallForest.squares, function(square) {
+				return smallForest.getX() === this.getSmallForestNum() - 1 &&
+				square.getX() === this.smallForestWidth - 1 && square.percentBurned > 0;
+			}, this);
+		}, this));
+	};
+
 	blaze.Square = function(x, y, smallForestX, smallForestY, smallForestWidth, smallForestNum) {
 		this.getX = _.constant(x);
 		this.getY = _.constant(y);

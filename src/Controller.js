@@ -74,6 +74,9 @@
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = [];
+			if(this.model.checkWinner()) {
+				alert("you win!");
+			}
 		}
 		this.view.update();
 	};
