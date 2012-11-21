@@ -29,7 +29,7 @@
 		this.tries = 0;
 
 		$('#restart').click(_.bind(function() {
-			this.model.resetForest();
+			this.model.newBoard($("#seed").val());
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
@@ -38,7 +38,8 @@
 
 
 		$('#newBoard').click(_.bind(function() {
-			this.model.newBoard();
+			$("#seed").val(Math.random() + "");
+			this.model.newBoard($("#seed").val());
 			if(this.interval === null){
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
@@ -51,12 +52,12 @@
 		}, this));
 
 		//disable double click selection
-		$(document).bind('mousedown.disableTextSelect', function() {
+		$("canvas").bind('mousedown.disableTextSelect', function() {
 			return false;
 		});
 
 		//initialize
-		this.model.newBoard();
+		this.model.newBoard($("#seed").val());
 		this.view.update();
 	};
 
