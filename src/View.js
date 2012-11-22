@@ -26,8 +26,6 @@
 		this.canvas.mouseleave(_.bind(this._mouseLeave, this));
 
 		this.cellSize = 1 / this.model.getGridSize();
-		this.visited = [];
-		this.potentialNeighbors = [];
 	};
 
 
@@ -35,18 +33,18 @@
 		if(Math.floor(this.model.waterLevel) > 0) {
 			var square = this.model.forestArray[this.model.copterSquare[0] + 
 			"," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
-			this.visited = [square];
+			this.model.visited = [square];
 			_.each(square.neighbors, function(n) {
 				if(this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
 					return this.arraysEqual(nn, n) }, this)) {
-					this.potentialNeighbors.push(n);
+					this.model.potentialNeighbors.push(n);
 				}	
 			}, this);
 
 			if(square.watered) {
 				var squares = [];
 				for(var iii = 0; iii < this.model.getFFNeighbors(); iii++) {
-					squares[iii] = this.getRandomAdjTree(square);
+					squares[iii] = this.model.getRandomAdjTree(square);
 				}
 				_.each(squares, function(square) {
 					square.water();
@@ -62,48 +60,6 @@
 			}
 			this.update();
 		}
-	};
-
-	blaze.View.prototype.getRandomAdjTree = function(square) {
-		var neighbor = null;
-		var neighbors = square.neighbors;
-		var neighborTrees = 0;
-		_.each(this.potentialNeighbors, function(n) {
-			if(!this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].watered) {
-				console.log(n);
-				neighborTrees++;
-			}
-		}, this);
-		console.log(neighborTrees);
-	
-		if(neighborTrees > 0) {
-			while(true) {
-				neighbor = neighbors[Math.round(Math.random() * neighbors.length)];
-				if(neighbor) {
-					square = this.model.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
-					if(square.watered && neighborTrees > 4) {
-						neighbors = square.neighbors;
-					} else if(square.isATree && !(_.contains(this.visited, square))) {
-						this.visited.push(square);
-						_.each(square.neighbors, function(n) {
-							if(this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
-								return this.arraysEqual(nn, n) }, this)) {
-								this.potentialNeighbors.push(n);
-							}
-						}, this);
-						return square;
-					} else if(square.isATree){
-						return square;
-					}
-				}
-			}	
-		} else {
-			return square;
-		}
-	};
-
-	blaze.View.prototype.arraysEqual = function (a1,a2) {
-    	return JSON.stringify(a1)==JSON.stringify(a2);
 	};
 
 	blaze.View.prototype._mouseMove = function(event) {

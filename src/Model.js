@@ -7,18 +7,20 @@
 		this.getWaterTankSize  = _.constant(setup.waterTankSize);
 		this.getFlammability   = _.constant(setup.flammability);
 		this.getBurnRate       = _.constant(setup.burnRate);
+		this.getPercentGreen   = _.constant(setup.percentGreen);
 		this.getSmallForestNum = _.constant(setup.smallForestNum);
 		this.smallForestWidth  = this.getGridSize() / this.getSmallForestNum();
 		this.getFFNeighbors    = _.constant(setup.floodFillNeighbors);
 		this.trees             = 0;
 		this.isBurning         = false;
 		this.inverted          = false;
+		this.visited           = [];
+		this.potentialNeighbors= [];
 		var coordinates        = _.product(_.repeat(_.range(this.getSmallForestNum()), 2));
 		this.forestArray       = {};
 		_.each(coordinates, function(coordinate) {
 			this.forestArray[coordinate] = new blaze.SmallForest(coordinate[0], coordinate[1], this);
 		}, this);
-
 	};
 
 	blaze.Model.prototype.step = function() {
@@ -44,6 +46,8 @@
 	};
 
 	blaze.Model.prototype.restart = function() {
+		this.visited           = [];
+		this.potentialNeighbors= [];
 		this.copterSquare = [];
 		this.isBurning    = true;
 		this.waterLevel   = 100;
@@ -66,6 +70,48 @@
 				square.getX() === this.smallForestWidth - 1 && square.percentBurned > 0;
 			}, this);
 		}, this));
+	};
+
+	blaze.Model.prototype.getRandomAdjTree = function(square) {
+		var neighbor = null;
+		var neighbors = square.neighbors;
+		var neighborTrees = 0;
+		_.each(this.potentialNeighbors, function(n) {
+			if(!this.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].watered) {
+				console.log(n);
+				neighborTrees++;
+			}
+		}, this);
+		console.log(neighborTrees);
+	
+		if(neighborTrees > 0) {
+			while(true) {
+				neighbor = neighbors[Math.round(Math.random() * neighbors.length)];
+				if(neighbor) {
+					square = this.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
+					if(square.watered && neighborTrees > 4) {
+						neighbors = square.neighbors;
+					} else if(square.isATree && !(_.contains(this.visited, square))) {
+						this.visited.push(square);
+						_.each(square.neighbors, function(n) {
+							if(this.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
+								return this.arraysEqual(nn, n) }, this)) {
+								this.potentialNeighbors.push(n);
+							}
+						}, this);
+						return square;
+					} else if(square.isATree){
+						return square;
+					}
+				}
+			}	
+		} else {
+			return square;
+		}
+	};
+
+	blaze.Model.prototype.arraysEqual = function (a1,a2) {
+    	return JSON.stringify(a1)==JSON.stringify(a2);
 	};
 
 	blaze.Square = function(x, y, smallForestX, smallForestY, smallForestWidth, smallForestNum) {
@@ -132,7 +178,7 @@
 		this.model = model;
 		this.getX = _.constant(x);
 		this.getY = _.constant(y);
-		this.density = 0.5;
+		this.density = this.model.getPercentGreen();
 		this.trees = 0;
 		var coordinates = _.product(_.repeat(_.range(this.model.smallForestWidth), 2));
 		this.squares = {};
@@ -161,4 +207,5 @@
 			}
 		}, this);
 	};
+
 }());
