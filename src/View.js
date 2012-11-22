@@ -27,23 +27,26 @@
 
 		this.cellSize = 1 / this.model.getGridSize();
 		this.visited = [];
+		this.potentialNeighbors = [];
 	};
 
-	blaze.View.prototype._mouseClick = function() {
 
+	blaze.View.prototype._mouseClick = function() {
 		if(Math.floor(this.model.waterLevel) > 0) {
 			var square = this.model.forestArray[this.model.copterSquare[0] + 
 			"," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
-			
+			this.visited = [square];
+			_.each(square.neighbors, function(n) {
+				if(this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
+					return this.arraysEqual(nn, n) }, this)) {
+					this.potentialNeighbors.push(n);
+				}	
+			}, this);
+
 			if(square.watered) {
 				var squares = [];
-				for(var iii = 0; iii <= this.model.getFFNeighbors(); iii++) {
+				for(var iii = 0; iii < this.model.getFFNeighbors(); iii++) {
 					squares[iii] = this.getRandomAdjTree(square);
-					if(!(_.contains(this.visited, squares[iii]))) {
-						this.visited.push(squares[iii]);
-					} else {
-						iii--;
-					}
 				}
 				_.each(squares, function(square) {
 					square.water();
@@ -51,7 +54,7 @@
 			} else {
 				square.water();
 			}
-			
+
 			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
 
 			if(this.model.waterLevel < 0) {
@@ -64,24 +67,48 @@
 	blaze.View.prototype.getRandomAdjTree = function(square) {
 		var neighbor = null;
 		var neighbors = square.neighbors;
-		if(_.any(neighbors, function(n){ return this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree; }, this)) {
+		var neighborTrees = 0;
+		_.each(this.potentialNeighbors, function(n) {
+			if(!this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].watered) {
+				console.log(n);
+				neighborTrees++;
+			}
+		}, this);
+		console.log(neighborTrees);
+	
+		if(neighborTrees > 0) {
 			while(true) {
-				neighbor = neighbors[Math.round(Math.random() * 8)];
+				neighbor = neighbors[Math.round(Math.random() * neighbors.length)];
 				if(neighbor) {
 					square = this.model.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
-					if(square.watered) {
+					if(square.watered && neighborTrees > 4) {
 						neighbors = square.neighbors;
-					} else if(square.isATree) {
+					} else if(square.isATree && !(_.contains(this.visited, square))) {
+						this.visited.push(square);
+						_.each(square.neighbors, function(n) {
+							if(this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
+								return this.arraysEqual(nn, n) }, this)) {
+								this.potentialNeighbors.push(n);
+							}
+						}, this);
+						return square;
+					} else if(square.isATree){
 						return square;
 					}
 				}
 			}	
+		} else {
+			return square;
 		}
 	};
 
+	blaze.View.prototype.arraysEqual = function (a1,a2) {
+    	return JSON.stringify(a1)==JSON.stringify(a2);
+	};
+
 	blaze.View.prototype._mouseMove = function(event) {
-		var smallForest         = this.getCoordinates(event, "smallForest");
-		var mouse               = this.getCoordinates(event, "cell");
+		var smallForest = this.getCoordinates(event, "smallForest");
+		var mouse = this.getCoordinates(event, "cell");
 		this.model.copterSquare = [smallForest[0], smallForest[1], mouse[0], mouse[1]];
 	};
 
@@ -110,18 +137,16 @@
 	};
 
 	blaze.View.prototype.update = function() {
-		var treesBurned           = 0;
-		var trees                 = 0;
+		var treesBurned = 0;
+		var trees = 0;
 		var treesCompletelyBurned = 0;
-		var displayCellSize       = this.cellSize + this.pixel;
+		var displayCellSize = this.cellSize + this.pixel;
 
 		_.each(this.model.forestArray, function(smallForest) {
 			trees += smallForest.trees;
 			_.each(smallForest.squares, function(square) {
 				var color = "rgb(112,51,0)";
-				if(smallForest.getX() === this.model.copterSquare[0] && 
-					smallForest.getY() === this.model.copterSquare[1] && 
-					square.getX() === this.model.copterSquare[2] && square.getY() === this.model.copterSquare[3]) {
+				if(smallForest.getX() === this.model.copterSquare[0] && smallForest.getY() === this.model.copterSquare[1] && square.getX() === this.model.copterSquare[2] && square.getY() === this.model.copterSquare[3]) {
 					color = "rgb(255,255,0)";
 				} else if(square.watered === true) {
 					if(square.isATree) {
@@ -137,21 +162,16 @@
 						treesCompletelyBurned++;
 						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= 0.5) {
-						color = "rgb(" + this.getBurnColor(square.percentBurned, 256, -1, 1) + 
-							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + 
-							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + ")";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 256, -1, 1) + "," + this.getBurnColor(square.percentBurned, 256, 1, 0) + "," + this.getBurnColor(square.percentBurned, 256, 1, 0) + ")";
 					} else {
-						color = "rgb(" + this.getBurnColor(square.percentBurned, 510, 1, 0.5) + 
-							"," + this.getBurnColor(square.percentBurned, 256, -1, 0) + ",0)";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 510, 1, 0.5) + "," + this.getBurnColor(square.percentBurned, 256, -1, 0) + ",0)";
 					}
 				}
 				if(this.model.inverted) {
 					color = this.invertColor(color);
 				}
 				this.ctx.fillStyle = color;
-				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.getX() * 
-					(1 / this.model.getSmallForestNum()), square.getY() * this.cellSize + 
-					(1 / this.model.getSmallForestNum()) * smallForest.getY(), displayCellSize, displayCellSize);
+				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.getX() * (1 / this.model.getSmallForestNum()), square.getY() * this.cellSize + (1 / this.model.getSmallForestNum()) * smallForest.getY(), displayCellSize, displayCellSize);
 			}, this);
 		}, this);
 
@@ -165,7 +185,7 @@
 	};
 
 	blaze.View.prototype.getBurnColor = function(percentBurned, p1, p2, p3) {
-		return Math.round(p1*(p2*0.5*Math.pow(2*percentBurned-1, 7)+p3+(Math.random()-0.5)*0.3));
+		return Math.round(p1 * (p2 * 0.5 * Math.pow(2 * percentBurned - 1, 7) + p3 + (Math.random() - 0.5) * 0.3));
 	};
 
 	blaze.View.prototype.invertColor = function(color) {
