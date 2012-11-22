@@ -26,9 +26,11 @@
 		this.canvas.mouseleave(_.bind(this._mouseLeave, this));
 
 		this.cellSize = 1 / this.model.getGridSize();
+		this.visited = [];
 	};
 
 	blaze.View.prototype._mouseClick = function() {
+
 		if(Math.floor(this.model.waterLevel) > 0) {
 			var square = this.model.forestArray[this.model.copterSquare[0] + 
 			"," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
@@ -37,6 +39,11 @@
 				var squares = [];
 				for(var iii = 0; iii <= this.model.getFFNeighbors(); iii++) {
 					squares[iii] = this.getRandomAdjTree(square);
+					if(!(_.contains(this.visited, squares[iii]))) {
+						this.visited.push(squares[iii]);
+					} else {
+						iii--;
+					}
 				}
 				_.each(squares, function(square) {
 					square.water();
