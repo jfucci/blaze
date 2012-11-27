@@ -31,26 +31,23 @@
 
 	blaze.View.prototype._mouseClick = function() {
 		if(Math.floor(this.model.waterLevel) > 0) {
-			var square = this.model.forestArray[this.model.copterSquare[0] + 
-			"," + this.model.copterSquare[1]].squares[this.model.copterSquare[2] + "," + this.model.copterSquare[3]];
-			this.model.visited = [square];
-			_.each(square.neighbors, function(n) {
-				if(this.model.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
-					return this.arraysEqual(nn, n) }, this)) {
-					this.model.potentialNeighbors.push(n);
-				}	
-			}, this);
+			var visited = [];
+			
+			if(this.model.copterSquare.isATree) {
+				this.model.walk(this.model.copterSquare, visited);
 
-			if(square.watered) {
-				var squares = [];
-				for(var iii = 0; iii < this.model.getFFNeighbors(); iii++) {
-					squares[iii] = this.model.getRandomAdjTree(square);
-				}
-				_.each(squares, function(square) {
-					square.water();
-				}, this);
+				_.chain(visited)
+					.shuffle()
+					.reject(function(square) {
+						return square.watered;
+					})
+					.first(3)
+					.each(function(square) {
+						square.water();
+					});
+			
 			} else {
-				square.water();
+				this.model.copterSquare.water();
 			}
 
 			this.model.waterLevel -= 100 / this.model.getWaterTankSize();
@@ -62,14 +59,16 @@
 		}
 	};
 
+
 	blaze.View.prototype._mouseMove = function(event) {
 		var smallForest = this.getCoordinates(event, "smallForest");
 		var mouse = this.getCoordinates(event, "cell");
-		this.model.copterSquare = [smallForest[0], smallForest[1], mouse[0], mouse[1]];
+		this.model.copterSquare = this.model.forestArray[smallForest[0] + 
+		"," + smallForest[1]].squares[mouse[0] + "," + mouse[1]];
 	};
 
 	blaze.View.prototype._mouseLeave = function() {
-		this.model.copterSquare = [];
+		this.model.copterSquare = {};
 	};
 
 	blaze.View.prototype.getCoordinates = function(event, area) {
@@ -102,7 +101,7 @@
 			trees += smallForest.trees;
 			_.each(smallForest.squares, function(square) {
 				var color = "rgb(112,51,0)";
-				if(smallForest.getX() === this.model.copterSquare[0] && smallForest.getY() === this.model.copterSquare[1] && square.getX() === this.model.copterSquare[2] && square.getY() === this.model.copterSquare[3]) {
+				if(square === this.model.copterSquare) {
 					color = "rgb(255,255,0)";
 				} else if(square.watered === true) {
 					if(square.isATree) {

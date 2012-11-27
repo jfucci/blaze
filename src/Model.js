@@ -14,8 +14,6 @@
 		this.trees             = 0;
 		this.isBurning         = false;
 		this.inverted          = false;
-		this.visited           = [];
-		this.potentialNeighbors= [];
 		var coordinates        = _.product(_.repeat(_.range(this.getSmallForestNum()), 2));
 		this.forestArray       = {};
 		_.each(coordinates, function(coordinate) {
@@ -46,9 +44,7 @@
 	};
 
 	blaze.Model.prototype.restart = function() {
-		this.visited           = [];
-		this.potentialNeighbors= [];
-		this.copterSquare = [];
+		this.copterSquare = {};
 		this.isBurning    = true;
 		this.waterLevel   = 100;
 	};
@@ -72,46 +68,19 @@
 		}, this));
 	};
 
-	blaze.Model.prototype.getRandomAdjTree = function(square) {
-		var neighbor = null;
-		var neighbors = square.neighbors;
-		var neighborTrees = 0;
-		_.each(this.potentialNeighbors, function(n) {
-			if(!this.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].watered) {
-				console.log(n);
-				neighborTrees++;
-			}
-		}, this);
-		console.log(neighborTrees);
-	
-		if(neighborTrees > 0) {
-			while(true) {
-				neighbor = neighbors[Math.round(Math.random() * neighbors.length)];
-				if(neighbor) {
-					square = this.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
-					if(square.watered && neighborTrees > 4) {
-						neighbors = square.neighbors;
-					} else if(square.isATree && !(_.contains(this.visited, square))) {
-						this.visited.push(square);
-						_.each(square.neighbors, function(n) {
-							if(this.forestArray[n[0] + "," + n[1]].squares[n[2] + "," + n[3]].isATree && !_.any(this.potentialNeighbors, function(nn) {
-								return this.arraysEqual(nn, n) }, this)) {
-								this.potentialNeighbors.push(n);
-							}
-						}, this);
-						return square;
-					} else if(square.isATree){
-						return square;
-					}
-				}
-			}	
-		} else {
-			return square;
+	blaze.Model.prototype.walk = function(start, visited) {
+		
+		if(_.contains(visited, start) || (!start.isATree && !start.watered)) {
+			return;
 		}
-	};
+		visited.push(start);
+		if(start.watered) {
+			_.each(start.neighbors, function(neighbor) {
+				var square = this.forestArray[neighbor[0] + "," + neighbor[1]].squares[neighbor[2] + "," + neighbor[3]];
+				this.walk(square, visited);
+			}, this);
+		}
 
-	blaze.Model.prototype.arraysEqual = function (a1,a2) {
-    	return JSON.stringify(a1)==JSON.stringify(a2);
 	};
 
 	blaze.Square = function(x, y, smallForestX, smallForestY, smallForestWidth, smallForestNum) {
