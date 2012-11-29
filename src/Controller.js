@@ -31,7 +31,7 @@
 		this.tries = 0;
 		this.seed = $("#seed").val();
 
-		$('#restart').click(_.bind(function() {
+		$("#restart").click(_.bind(function() {
 			this.model.newBoard($("#seed").val());
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
@@ -45,23 +45,23 @@
 		}, this));
 
 
-		$('#newBoard').click(_.bind(function() {
+		$("#newBoard").click(_.bind(function() {
 			$("#seed").val(Math.pow(10e+17, Math.random()) + "");
 			this.model.newBoard($("#seed").val());
-			if(this.interval === null){
+			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
 			$("#tries .value").text(this.tries = 1);
 			this.seed = $("#seed").val();
 		}, this));
 
-		$('#invert').click(_.bind(function() {
+		$("#invert").click(_.bind(function() {
 			this.model.inverted = !this.model.inverted;
 			this.view.update();
 		}, this));
 
 		//disable double click selection
-		$("canvas").bind('mousedown.disableTextSelect', function() {
+		$("canvas").bind("mousedown.disableTextSelect", function() {
 			return false;
 		});
 
@@ -78,12 +78,12 @@
 
 	blaze.Controller.prototype.step = function() {
 		this.model.step();
-		if(!this.model.isBurning){
+		if(!this.model.isBurning) {
 			window.clearInterval(this.interval);
 			this.interval = null;
-			this.model.copterSquare = [];
+			this.model.copterSquare = {};
 			if(this.model.checkWinner()) {
-				$("#nextLevel").show();	
+				$("#nextLevel").show();
 			}
 		}
 		this.view.update();

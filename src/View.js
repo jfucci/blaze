@@ -32,20 +32,16 @@
 	blaze.View.prototype._mouseClick = function() {
 		if(Math.floor(this.model.waterLevel) > 0) {
 			var visited = [];
-			
+
 			if(this.model.copterSquare.isATree) {
 				this.model.walk(this.model.copterSquare, visited);
 
-				_.chain(visited)
-					.shuffle()
-					.reject(function(square) {
-						return square.watered;
-					})
-					.first(3)
-					.each(function(square) {
-						square.water();
-					});
-			
+				_.chain(visited).shuffle().reject(function(square) {
+					return square.watered;
+				}).first(this.model.getFFNeighbors()).each(function(square) {
+					square.water();
+				});
+
 			} else {
 				this.model.copterSquare.water();
 			}
@@ -63,8 +59,8 @@
 	blaze.View.prototype._mouseMove = function(event) {
 		var smallForest = this.getCoordinates(event, "smallForest");
 		var mouse = this.getCoordinates(event, "cell");
-		this.model.copterSquare = this.model.forestArray[smallForest[0] + 
-		"," + smallForest[1]].squares[mouse[0] + "," + mouse[1]];
+		this.model.copterSquare = this.model.forestArray[smallForest[0] + "," + 
+			smallForest[1]].squares[mouse[0] + "," + mouse[1]];
 	};
 
 	blaze.View.prototype._mouseLeave = function() {
@@ -74,8 +70,8 @@
 	blaze.View.prototype.getCoordinates = function(event, area) {
 		var pixelX = event.pageX - this.canvas.offset().left;
 		var pixelY = event.pageY - this.canvas.offset().top;
-		var x = 0;
-		var y = 0;
+		var x      = 0;
+		var y      = 0;
 
 		if(pixelX < this.canvas.width() && pixelX > 0 && pixelY < this.canvas.height() && pixelY > 0) {
 			if(area === "cell") {
@@ -92,10 +88,10 @@
 	};
 
 	blaze.View.prototype.update = function() {
-		var treesBurned = 0;
-		var trees = 0;
+		var treesBurned           = 0;
+		var trees                 = 0;
 		var treesCompletelyBurned = 0;
-		var displayCellSize = this.cellSize + this.pixel;
+		var displayCellSize       = this.cellSize + this.pixel;
 
 		_.each(this.model.forestArray, function(smallForest) {
 			trees += smallForest.trees;
@@ -117,16 +113,21 @@
 						treesCompletelyBurned++;
 						color = "rgb(128,128,128)";
 					} else if(square.percentBurned >= 0.5) {
-						color = "rgb(" + this.getBurnColor(square.percentBurned, 256, -1, 1) + "," + this.getBurnColor(square.percentBurned, 256, 1, 0) + "," + this.getBurnColor(square.percentBurned, 256, 1, 0) + ")";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 256, -1, 1) +
+							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + 
+							"," + this.getBurnColor(square.percentBurned, 256, 1, 0) + ")";
 					} else {
-						color = "rgb(" + this.getBurnColor(square.percentBurned, 510, 1, 0.5) + "," + this.getBurnColor(square.percentBurned, 256, -1, 0) + ",0)";
+						color = "rgb(" + this.getBurnColor(square.percentBurned, 510, 1, 0.5) + 
+							"," + this.getBurnColor(square.percentBurned, 256, -1, 0) + ",0)";
 					}
 				}
 				if(this.model.inverted) {
 					color = this.invertColor(color);
 				}
 				this.ctx.fillStyle = color;
-				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.getX() * (1 / this.model.getSmallForestNum()), square.getY() * this.cellSize + (1 / this.model.getSmallForestNum()) * smallForest.getY(), displayCellSize, displayCellSize);
+				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.getX() * 
+					(1 / this.model.getSmallForestNum()), square.getY() * this.cellSize + smallForest.getY() *
+					(1 / this.model.getSmallForestNum()), displayCellSize, displayCellSize);
 			}, this);
 		}, this);
 
@@ -144,7 +145,7 @@
 	};
 
 	blaze.View.prototype.invertColor = function(color) {
-		var oldColor = color.split('(')[1].split(')')[0].split(',');
+		var oldColor = color.split("(")[1].split(")")[0].split(",");
 		var invertedColor = [];
 		for(var iii = 0; iii < oldColor.length; iii++) {
 			invertedColor[iii] = 255 - Number(oldColor[iii]);
