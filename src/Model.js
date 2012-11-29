@@ -4,13 +4,13 @@
 
 	blaze.Model = function(setup) {
 		this.getGridSize       = _.constant(setup.gridSize);
-		this.getWaterTankSize  = _.constant(setup.waterTankSize);
-		this.getFlammability   = _.constant(setup.flammability);
+		this.getWaterTankSize  = _.constant(setup.waterTankSize[0]);
+		this.getFlammability   = _.constant(setup.flammability[0]);
 		this.getBurnRate       = _.constant(setup.burnRate);
 		this.getPercentGreen   = _.constant(setup.percentGreen);
+		this.getFFNeighbors    = _.constant(setup.floodFillNeighbors[0]);
 		this.getSmallForestNum = _.constant(setup.smallForestNum);
 		this.smallForestWidth  = this.getGridSize() / this.getSmallForestNum();
-		this.getFFNeighbors    = _.constant(setup.floodFillNeighbors);
 		this.trees             = 0;
 		this.isBurning         = false;
 		this.inverted          = false;
@@ -91,7 +91,7 @@
 		this.restart();
 		_.each(this.forestArray, function(smallForest) {
 			smallForest.newForest();
-		}, this);
+		});
 		Math.seedrandom();
 	};
 

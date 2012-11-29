@@ -55,7 +55,6 @@
 		}
 	};
 
-
 	blaze.View.prototype._mouseMove = function(event) {
 		var smallForest = this.getCoordinates(event, "smallForest");
 		var mouse = this.getCoordinates(event, "cell");
@@ -70,8 +69,7 @@
 	blaze.View.prototype.getCoordinates = function(event, area) {
 		var pixelX = event.pageX - this.canvas.offset().left;
 		var pixelY = event.pageY - this.canvas.offset().top;
-		var x      = 0;
-		var y      = 0;
+		var x, y;
 
 		if(pixelX < this.canvas.width() && pixelX > 0 && pixelY < this.canvas.height() && pixelY > 0) {
 			if(area === "cell") {
