@@ -22,40 +22,43 @@
 			//number of neighbors that are filled when clicking on a watered square
 			floodFillNeighbors: [6, 5, 3, 2]
 		};
-		//#of millis to delay between steps
-		this.stepDelay = 50;
+		
+		this.stepDelay    = 50; //#of millis to delay between steps
+		this.model        = new blaze.Model(setup);
+		this.view         = new blaze.View(this.model);
+		this.interval     = null;
+		this.tries        = 0;
+		this.levelScores  = [];
+		this.level        = 0;
+		var previousSeed  = $("#seed").val();
+		var levelSelector = document.getElementById("levels");
 
-		this.model    = new blaze.Model(setup);
-		this.view     = new blaze.View(this.model);
-		this.interval = null;
-		this.tries    = 0;
-		this.level    = 0;
-		this.seed     = $("#seed").val();
-
+		//restart button:
 		$("#restart").click(_.bind(function() {
 			this.model.newBoard($("#seed").val());
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
-			if($("#seed").val() === this.seed) {
+			if($("#seed").val() === previousSeed) {
 				$("#tries .value").text(++this.tries);
 			} else {
 				$("#tries .value").text(this.tries = 1);
-				this.seed = $("#seed").val();
+				previousSeed = $("#seed").val();
 			}
 		}, this));
 
-
+		//new board button:
 		$("#newBoard").click(_.bind(function() {
-			$("#seed").val(Math.pow(10e+17, Math.random()) + "")
+			$("#seed").val(Math.pow(10e+17, Math.random()) + "");
 			this.model.newBoard($("#seed").val());
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
 			$("#tries .value").text(this.tries = 1);
-			this.seed = $("#seed").val();
+			previousSeed = $("#seed").val();
 		}, this));
 
+		//invert button:
 		$("#invert").click(_.bind(function() {
 			this.model.inverted = !this.model.inverted;
 			this.view.update();
@@ -66,28 +69,52 @@
 			return false;
 		});
 
+		//level selector:
+		for(var iii = 2; iii <= levelSelector.length; iii++) {
+			$("#" + iii).hide();
+		}
+
+		$("#levels").click(_.bind(function() {
+			this.setupLevel(setup, levelSelector.selectedIndex);
+			this.level = levelSelector.options[levelSelector.selectedIndex].id - 1;
+			$("#seed").val("level " + (this.level + 1));
+			$("#restart").click();
+			previousSeed = $("#seed").val();
+			this.view.update();
+		}, this));
+
+
+		//hidden next level button:
 		$("#nextLevel").hide();
 
 		$("#nextLevel").click(_.bind(function() {
-
-			$("#nextLevel").hide();
 			this.level++;
-
-			this.model.getFlammability  = _.constant(setup.flammability[this.level]);
-			this.model.getWaterTankSize = _.constant(setup.waterTankSize[this.level]);
-			this.model.getFFNeighbors   = _.constant(setup.floodFillNeighbors[this.level]);
+			$("#nextLevel").hide();
 			
-			$("#seed").val("level " + (this.level + 1));
-			this.seed = $("#seed").val();
-			this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
+			if(this.level < levelSelector.length) {
+				$("#" + (this.level + 1)).show();
+				levelSelector.selectedIndex = this.level;
+				this.setupLevel(setup, this.level);
 			
-			this.model.newBoard(this.seed);
-			this.view.update();
+				$("#seed").val("level " + (this.level + 1));
+				$("#restart").click();
+				previousSeed = $("#seed").val();
+				this.view.update();
+			}
+			else {
+				$("#end .value").text("Congratulations! You have finished the game!");
+			}
 		}, this));
 
 		//initialize
 		this.model.newBoard($("#seed").val());
 		this.view.update();
+	};
+
+	blaze.Controller.prototype.setupLevel = function(setup, level) {
+		this.model.getFlammability  = _.constant(setup.flammability[level]);
+		this.model.getWaterTankSize = _.constant(setup.waterTankSize[level]);
+		this.model.getFFNeighbors   = _.constant(setup.floodFillNeighbors[level]);
 	};
 
 	blaze.Controller.prototype.step = function() {
@@ -97,6 +124,15 @@
 			this.interval = null;
 			this.model.copterSquare = {};
 			if(this.model.checkWinner()) {
+
+				if(!this.levelScores[this.level] || this.levelScores[this.level][1] > Number($("#burned .value").text())) {
+					this.levelScores[this.level] = [Number($("#water .value").text()),  
+						 Number($("#burned .value").text()), this.tries];
+					$("#level" + (this.level + 1) + " .value").text("Water Left: " + this.levelScores[this.level][0] + 
+					"% , Trees Burned: " + this.levelScores[this.level][1] + "% , Tries: " + 
+					this.levelScores[this.level][2]);
+				}
+
 				$("#nextLevel").show();
 			}
 		}

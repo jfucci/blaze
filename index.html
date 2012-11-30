@@ -24,6 +24,7 @@
         <div id="canvas_wrap"><canvas id="canvas"></canvas></div>
         <div id="controls">
             <h3>Blaze</h3>
+            
             <div class="stats">
                 <div id="water">
                     Water Left:
@@ -39,16 +40,48 @@
                 <div><span class="value">0</span></div>
             </div>
             <br/>
+            
+            <div class="scores">
+                Scores:
+                <div id="level1">Level 1:
+                    <span class="value">--</span>
+                </div>
+                <div id="level2">Level 2:
+                    <span class="value">--</span>
+                </div>
+                <div id="level3">Level 3:
+                    <span class="value">--</span>
+                </div>
+                <div id="level4">Level 4:
+                    <span class="value">--</span>
+                </div>
+            </div>
+            <br/>
+            
             <a class="btn" id="restart">Restart</a>
             <br/><br/>
+            
             <a class ="btn" id="newBoard">New Board</a>
             <br/><br/>
+            
             <a class ="btn" id="invert">Invert</a>
             <br/><br/>
+            
             Map: <input type="text" id="seed" value="level 1">
             <br/> (press "Restart" to submit the map value)
             <br/><br/>
+            
+            <select id="levels">
+                <option id="1" selected="selected">Level 1</option>
+                <option id="2">Level 2</option>
+                <option id="3">Level 3</option>
+                <option id="4">Level 4</option>
+            </select>
+            <br/><br/>
+            
             <a class ="btn" id="nextLevel">Next Level</a>
+            
+            <div id="end"><span class="value"></span></div>
         </div>
   </body>  
 </html>
