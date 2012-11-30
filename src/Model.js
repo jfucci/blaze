@@ -23,7 +23,6 @@
 	};
 
 	blaze.Model.prototype.getNeighbors = function() {
-
 		var coordinates = _.chain(_.range(-1,2)).repeat(2).product().reject(_.bind(_.isEqual,null,[0,0])).value();
 
 		_.each(this.forestArray, function(smallForest) {

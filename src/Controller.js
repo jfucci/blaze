@@ -17,12 +17,12 @@
 			burnRate: 0.0025,
 			//number of times water can be droppped
 			waterTankSize: [40, 35, 30, 25],
-			//porbabilty of a square being flammable when the game starts
+			//probabilty of a square being flammable when the game starts
 			percentGreen: 0.5,
 			//number of neighbors that are filled when clicking on a watered square
 			floodFillNeighbors: [6, 5, 3, 2]
 		};
-		
+
 		this.stepDelay    = 50; //#of millis to delay between steps
 		this.model        = new blaze.Model(setup);
 		this.view         = new blaze.View(this.model);
@@ -79,7 +79,14 @@
 			this.level = levelSelector.options[levelSelector.selectedIndex].id - 1;
 			$("#seed").val("level " + (this.level + 1));
 			$("#restart").click();
+			if(this.levelScores[this.level]) {
+				this.displayScore();
+			} else {
+				$("#score .value").text("--");
+			}
+			
 			previousSeed = $("#seed").val();
+
 			this.view.update();
 		}, this));
 
@@ -90,18 +97,23 @@
 		$("#nextLevel").click(_.bind(function() {
 			this.level++;
 			$("#nextLevel").hide();
-			
+
 			if(this.level < levelSelector.length) {
 				$("#" + (this.level + 1)).show();
 				levelSelector.selectedIndex = this.level;
 				this.setupLevel(setup, this.level);
-			
+
+				if(this.levelScores[this.level]) {
+					this.displayScore();
+				} else {
+					$("#score .value").text("--");
+				}
+
 				$("#seed").val("level " + (this.level + 1));
 				$("#restart").click();
 				previousSeed = $("#seed").val();
 				this.view.update();
-			}
-			else {
+			} else {
 				$("#end .value").text("Congratulations! You have finished the game!");
 			}
 		}, this));
@@ -124,19 +136,23 @@
 			this.interval = null;
 			this.model.copterSquare = {};
 			if(this.model.checkWinner()) {
-
+				//store the score:
 				if(!this.levelScores[this.level] || this.levelScores[this.level][1] > Number($("#burned .value").text())) {
-					this.levelScores[this.level] = [Number($("#water .value").text()),  
-						 Number($("#burned .value").text()), this.tries];
-					$("#level" + (this.level + 1) + " .value").text("Water Left: " + this.levelScores[this.level][0] + 
-					"% , Trees Burned: " + this.levelScores[this.level][1] + "% , Tries: " + 
-					this.levelScores[this.level][2]);
+					this.levelScores[this.level] = [Number($("#water .value").text()), 
+						Number($("#burned .value").text()), this.tries];
+					this.displayScore();
 				}
-
+				//show the next level button:
 				$("#nextLevel").show();
 			}
 		}
 		this.view.update();
+	};
+
+	blaze.Controller.prototype.displayScore = function() {
+		$("#score .value").text("Water Left: " + this.levelScores[this.level][0] + "% , " +
+								"Trees Burned: " + this.levelScores[this.level][1] + "% , " +
+								"Tries: " + this.levelScores[this.level][2]);
 	};
 
 }());
