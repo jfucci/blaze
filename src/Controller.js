@@ -66,7 +66,8 @@
 			return false;
 		});
 
-		//$("#nextLevel").hide();
+		$("#nextLevel").hide();
+		
 		$("#nextLevel").click(_.bind(function() {
 
 			$("#nextLevel").hide();
@@ -77,6 +78,7 @@
 			this.model.getFFNeighbors   = _.constant(setup.floodFillNeighbors[this.level]);
 			
 			this.seed = $("#seed").val("level" + (this.level + 1));
+			this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			
 			this.model.newBoard(this.seed);
 			this.view.update();
