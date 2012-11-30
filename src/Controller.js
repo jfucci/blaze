@@ -77,7 +77,8 @@
 			this.model.getWaterTankSize = _.constant(setup.waterTankSize[this.level]);
 			this.model.getFFNeighbors   = _.constant(setup.floodFillNeighbors[this.level]);
 			
-			this.seed = $("#seed").val("level " + (this.level + 1));
+			$("#seed").val("level " + (this.level + 1));
+			this.seed = $("#seed").val();
 			this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			
 			this.model.newBoard(this.seed);
