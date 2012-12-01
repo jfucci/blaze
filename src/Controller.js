@@ -30,12 +30,14 @@
 		this.tries        = 0;
 		this.levelScores  = [];
 		this.level        = 0;
+		this.winPercent   = 30;
 		var previousSeed  = $("#seed").val();
 		var levelSelector = document.getElementById("levels");
 
 		//restart button:
 		$("#restart").click(_.bind(function() {
 			this.model.newBoard($("#seed").val());
+			$("#message .value").text("");
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
@@ -51,6 +53,7 @@
 		$("#newBoard").click(_.bind(function() {
 			$("#seed").val(Math.pow(10e+17, Math.random()) + "");
 			this.model.newBoard($("#seed").val());
+			$("#message .value").text("");
 			if(this.interval === null) {
 				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
 			}
@@ -82,7 +85,7 @@
 			if(this.levelScores[this.level]) {
 				this.displayScore();
 			} else {
-				$("#score .value").text("--");
+				this.blankScore();
 			}
 			
 			previousSeed = $("#seed").val();
@@ -106,7 +109,7 @@
 				if(this.levelScores[this.level]) {
 					this.displayScore();
 				} else {
-					$("#score .value").text("--");
+					this.blankScore();
 				}
 
 				$("#seed").val("level " + (this.level + 1));
@@ -114,7 +117,7 @@
 				previousSeed = $("#seed").val();
 				this.view.update();
 			} else {
-				$("#end .value").text("Congratulations! You have finished the game!");
+				$("#message .value").text("Congratulations! You have finished the game!");
 			}
 		}, this));
 
@@ -135,7 +138,7 @@
 			window.clearInterval(this.interval);
 			this.interval = null;
 			this.model.copterSquare = {};
-			if(this.model.checkWinner()) {
+			if(Number($("#burned .value").text()) < this.winPercent) {
 				//store the score:
 				if(!this.levelScores[this.level] || this.levelScores[this.level][1] > Number($("#burned .value").text())) {
 					this.levelScores[this.level] = [Number($("#water .value").text()), 
@@ -144,15 +147,22 @@
 				}
 				//show the next level button:
 				$("#nextLevel").show();
+			} else {
+				$("#message .value").text("You must save at least 70% of the forest!");
 			}
 		}
 		this.view.update();
 	};
 
 	blaze.Controller.prototype.displayScore = function() {
-		$("#score .value").text("Water Left: " + this.levelScores[this.level][0] + "% , " +
-								"Trees Burned: " + this.levelScores[this.level][1] + "% , " +
-								"Tries: " + this.levelScores[this.level][2]);
+		$("#score .water").text(this.levelScores[this.level][0]);
+		$("#score .trees").text(this.levelScores[this.level][1]);
+		$("#score .tries").text(this.levelScores[this.level][2]);
 	};
 
+	blaze.Controller.prototype.blankScore = function() {
+		$("#score .water").text("--");
+		$("#score .trees").text("--");
+		$("#score .tries").text("--");
+	};
 }());
