@@ -3,29 +3,17 @@
 	"use strict";
 
 	$(document).ready(function() {
-		new blaze.Controller();
+		$.ajax({
+			type: "GET",
+			url: "levels.csv", 
+			dataType: "text",
+			success: function(data){new blaze.Controller(data);}
+		});
 	});
 
-	blaze.Controller = function() {
-		var setup = {
-			gridSize: 50,
-			//number of small forests horizonal in the forest array
-			smallForestNum: 10,
-			//probability of a tree burning if an adjacent tree is burning
-			flammability: [0.015, 0.02, 0.025, 0.03],
-			//1/burnRate = # of steps for trees to burn completely
-			burnRate: 0.0025,
-			//number of times water can be droppped
-			waterTankSize: [40, 35, 30, 25],
-			//probabilty of a square being flammable when the game starts
-			percentGreen: 0.5,
-			//number of neighbors that are filled when clicking on a watered square
-			floodFillNeighbors: [6, 5, 3, 2]
-		};
+	blaze.Controller = function(data) {
 
 		this.stepDelay    = 50; //#of millis to delay between steps
-		this.model        = new blaze.Model(setup);
-		this.view         = new blaze.View(this.model);
 		this.interval     = null;
 		this.tries        = 0;
 		this.levelScores  = [];
@@ -33,6 +21,28 @@
 		this.winPercent   = 30;
 		var previousSeed  = $("#seed").val();
 		var levelSelector = document.getElementById("levels");
+
+		/*******new stuff********/
+
+		data = _.rest(data.split("\n"), 2);
+
+		var levels= [];
+		var i = 0;
+		for(var j = 0; j < levelSelector.length; j++) {
+			levels.push([]);
+		}
+
+		_.each(data, function(line) {
+			_.each(line.split(","), function(val) {
+				levels[i].push(Number(val));
+			}, this);
+			i++;
+		}, this);
+
+		/*********end new stuff*********/
+
+		this.model        = new blaze.Model(levels);
+		this.view         = new blaze.View(this.model);
 
 		//restart button:
 		$("#restart").click(_.bind(function() {
@@ -78,8 +88,8 @@
 		}
 
 		$("#levels").click(_.bind(function() {
-			this.setupLevel(setup, levelSelector.selectedIndex);
-			this.level = levelSelector.options[levelSelector.selectedIndex].id - 1;
+			this.setupLevel(levels, levelSelector.selectedIndex);
+			this.level = levelSelector.selectedIndex;
 			$("#seed").val("level " + (this.level + 1));
 			$("#restart").click();
 			if(this.levelScores[this.level]) {
@@ -104,7 +114,7 @@
 			if(this.level < levelSelector.length) {
 				$("#" + (this.level + 1)).show();
 				levelSelector.selectedIndex = this.level;
-				this.setupLevel(setup, this.level);
+				this.setupLevel(levels, this.level);
 
 				if(this.levelScores[this.level]) {
 					this.displayScore();
@@ -126,10 +136,10 @@
 		this.view.update();
 	};
 
-	blaze.Controller.prototype.setupLevel = function(setup, level) {
-		this.model.getFlammability  = _.constant(setup.flammability[level]);
-		this.model.getWaterTankSize = _.constant(setup.waterTankSize[level]);
-		this.model.getFFNeighbors   = _.constant(setup.floodFillNeighbors[level]);
+	blaze.Controller.prototype.setupLevel = function(levels, level) {
+		this.model.getFlammability  = _.constant(levels[level][4]);
+		this.model.getWaterTankSize = _.constant(levels[level][5]);
+		this.model.getFFNeighbors   = _.constant(levels[level][6]);
 	};
 
 	blaze.Controller.prototype.step = function() {

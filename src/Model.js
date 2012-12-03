@@ -2,14 +2,14 @@
 (function() {
 	"use strict";
 
-	blaze.Model = function(setup) {
-		this.getGridSize       = _.constant(setup.gridSize);
-		this.getWaterTankSize  = _.constant(setup.waterTankSize[0]);
-		this.getFlammability   = _.constant(setup.flammability[0]);
-		this.getBurnRate       = _.constant(setup.burnRate);
-		this.getPercentGreen   = _.constant(setup.percentGreen);
-		this.getFFNeighbors    = _.constant(setup.floodFillNeighbors[0]);
-		this.getSmallForestNum = _.constant(setup.smallForestNum);
+	blaze.Model = function(levels) {
+		this.getGridSize       = _.constant(levels[0][0]);
+		this.getSmallForestNum = _.constant(levels[0][1]);
+		this.getBurnRate       = _.constant(levels[0][2]);
+		this.getPercentGreen   = _.constant(levels[0][3]);
+		this.getFlammability   = _.constant(levels[0][4]);
+		this.getWaterTankSize  = _.constant(levels[0][5]);
+		this.getFFNeighbors    = _.constant(levels[0][6]);
 		this.smallForestWidth  = this.getGridSize() / this.getSmallForestNum();
 		this.trees             = 0;
 		this.isBurning         = false;
@@ -167,7 +167,7 @@
 		this.trees = 0;
 		_.each(this.squares, function(square) {
 			square.setup();
-			if(Math.random() < this.density) {
+			if(Math.random() < this.density - (Math.random() / 5) + (Math.random() / 4)) {
 				square.isATree = true;
 				this.trees++;
 				this.growTree(square);
