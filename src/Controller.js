@@ -28,7 +28,7 @@
 
 		var levels= [];
 		var i = 0;
-		for(var j = 0; j < levelSelector.length; j++) {
+		for(var j = 0; j < 5; j++) {
 			levels.push([]);
 		}
 
@@ -37,6 +37,7 @@
 				levels[i].push(Number(val));
 			}, this);
 			i++;
+			$("#levels").append("<option id=" + i + ">Level " + i + "</option>");
 		}, this);
 
 		/*********end new stuff*********/
