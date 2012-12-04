@@ -7,43 +7,41 @@
 			type: "GET",
 			url: "levels.csv", 
 			dataType: "text",
-			success: function(data){new blaze.Controller(data);}
+			success: function(data) {
+				new blaze.Controller(data);
+			}
 		});
 	});
 
 	blaze.Controller = function(data) {
-
 		this.stepDelay    = 50; //#of millis to delay between steps
 		this.interval     = null;
 		this.tries        = 0;
 		this.levelScores  = [];
 		this.level        = 0;
 		this.winPercent   = 30;
-		var previousSeed  = $("#seed").val();
 		var levelSelector = document.getElementById("levels");
+		var levels        = [];
+		var i             = 0;
 
-		/*******new stuff********/
+		$("#seed").val("level 1"); //necessary to reset the seed when the user reloads the page in firefox
+		var previousSeed  = $("#seed").val();
 
-		data = _.rest(data.split("\n"), 2);
-
-		var levels= [];
-		var i = 0;
-		for(var j = 0; j < 5; j++) {
+		//set up the levels:
+		_.each(_.rest(data.split("\n"), 2), function(line) {
 			levels.push([]);
-		}
-
-		_.each(data, function(line) {
 			_.each(line.split(","), function(val) {
 				levels[i].push(Number(val));
 			}, this);
 			i++;
-			$("#levels").append("<option id=" + i + ">Level " + i + "</option>");
+			$("#levels").append("<option id=" + i + " style=\"display: none;\">Level " + i + "</option>");
 		}, this);
 
-		/*********end new stuff*********/
+		$("#1").show();
 
-		this.model        = new blaze.Model(levels);
-		this.view         = new blaze.View(this.model);
+		//create the model and view:
+		this.model = new blaze.Model(levels[0]);
+		this.view  = new blaze.View(this.model);
 
 		//restart button:
 		$("#restart").click(_.bind(function() {
@@ -63,13 +61,7 @@
 		//new board button:
 		$("#newBoard").click(_.bind(function() {
 			$("#seed").val(Math.pow(10e+17, Math.random()) + "");
-			this.model.newBoard($("#seed").val());
-			$("#message .value").text("");
-			if(this.interval === null) {
-				this.interval = window.setInterval(_.bind(this.step, this), this.stepDelay);
-			}
-			$("#tries .value").text(this.tries = 1);
-			previousSeed = $("#seed").val();
+			$("#restart").click();
 		}, this));
 
 		//invert button:
@@ -78,16 +70,12 @@
 			this.view.update();
 		}, this));
 
-		//disable double click selection
+		//disable double click selection:
 		$("canvas").bind("mousedown.disableTextSelect", function() {
 			return false;
 		});
 
 		//level selector:
-		for(var iii = 2; iii <= levelSelector.length; iii++) {
-			$("#" + iii).hide();
-		}
-
 		$("#levels").click(_.bind(function() {
 			this.setupLevel(levels, levelSelector.selectedIndex);
 			this.level = levelSelector.selectedIndex;
@@ -98,12 +86,8 @@
 			} else {
 				this.blankScore();
 			}
-			
-			previousSeed = $("#seed").val();
-
 			this.view.update();
 		}, this));
-
 
 		//hidden next level button:
 		$("#nextLevel").hide();
@@ -125,14 +109,13 @@
 
 				$("#seed").val("level " + (this.level + 1));
 				$("#restart").click();
-				previousSeed = $("#seed").val();
 				this.view.update();
 			} else {
 				$("#message .value").text("Congratulations! You have finished the game!");
 			}
 		}, this));
 
-		//initialize
+		//initialize:
 		this.model.newBoard($("#seed").val());
 		this.view.update();
 	};
@@ -152,7 +135,7 @@
 			if(Number($("#burned .value").text()) < this.winPercent) {
 				//store the score:
 				if(!this.levelScores[this.level] || this.levelScores[this.level][1] > Number($("#burned .value").text())) {
-					this.levelScores[this.level] = [Number($("#water .value").text()), 
+					this.levelScores[this.level] = [Number($("#water .value").text()),
 						Number($("#burned .value").text()), this.tries];
 					this.displayScore();
 				}

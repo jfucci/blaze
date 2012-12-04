@@ -2,14 +2,14 @@
 (function() {
 	"use strict";
 
-	blaze.Model = function(levels) {
-		this.getGridSize       = _.constant(levels[0][0]);
-		this.getSmallForestNum = _.constant(levels[0][1]);
-		this.getBurnRate       = _.constant(levels[0][2]);
-		this.getPercentGreen   = _.constant(levels[0][3]);
-		this.getFlammability   = _.constant(levels[0][4]);
-		this.getWaterTankSize  = _.constant(levels[0][5]);
-		this.getFFNeighbors    = _.constant(levels[0][6]);
+	blaze.Model = function(initLevel) {
+		this.getGridSize       = _.constant(initLevel[0]);
+		this.getSmallForestNum = _.constant(initLevel[1]);
+		this.getBurnRate       = _.constant(initLevel[2]);
+		this.getPercentGreen   = _.constant(initLevel[3]);
+		this.getFlammability   = _.constant(initLevel[4]);
+		this.getWaterTankSize  = _.constant(initLevel[5]);
+		this.getFFNeighbors    = _.constant(initLevel[6]);
 		this.smallForestWidth  = this.getGridSize() / this.getSmallForestNum();
 		this.trees             = 0;
 		this.isBurning         = false;
@@ -22,6 +22,7 @@
 		this.getNeighbors();
 	};
 
+	//the only function that still needs to be cleaned up:
 	blaze.Model.prototype.getNeighbors = function() {
 		var coordinates = _.chain(_.range(-1,2)).repeat(2).product().reject(_.bind(_.isEqual,null,[0,0])).value();
 
@@ -32,41 +33,39 @@
 					var y = square.getY() + coordinate[1];
 					var smForestX = smallForest.getX();
 					var smForestY = smallForest.getY();
-					var bool = true;
 					
 					if(x >= this.smallForestWidth) {
 						x = 0;
 						if(smallForest.getX() + 1 < this.getSmallForestNum()) {
 							smForestX++;
 						} else {
-							bool = false;
+							return true;
 						}
 					} else if(x < 0) {
 						x = this.smallForestWidth - 1;
 						if(smallForest.getX() - 1 >= 0) {
 							smForestX--;
 						} else {
-							bool = false;
+							return true;
 						}
 					}
+
 					if(y >= this.smallForestWidth) {
 						y = 0;
 						if(smallForest.getY() + 1 < this.getSmallForestNum()) {
 							smForestY++;
 						} else {
-							bool = false;
+							return true;
 						}
 					} else if(y < 0) {
 						y = this.smallForestWidth - 1;
 						if(smallForest.getY() - 1 >= 0) {
 							smForestY--;
 						} else {
-							bool = false;
+							return true;
 						}
 					}
-					if(bool) {
-						square.neighbors.push(this.forestArray[smForestX + "," + smForestY].squares[x + "," + y]);
-					}
+					square.neighbors.push(this.forestArray[smForestX + "," + smForestY].squares[x + "," + y]);
 				}, this);
 			}, this);
 		}, this);

@@ -122,10 +122,11 @@
 				if(this.model.inverted) {
 					color = this.invertColor(color);
 				}
+
 				this.ctx.fillStyle = color;
-				this.ctx.fillRect(square.getX() * this.cellSize + smallForest.getX() * 
-					(1 / this.model.getSmallForestNum()), square.getY() * this.cellSize + smallForest.getY() *
-					(1 / this.model.getSmallForestNum()), displayCellSize, displayCellSize);
+				this.ctx.fillRect(square.getX() * this.cellSize + 
+					(smallForest.getX() / this.model.getSmallForestNum()), square.getY() * this.cellSize + 
+					(smallForest.getY() / this.model.getSmallForestNum()), displayCellSize, displayCellSize);
 			}, this);
 		}, this);
 
