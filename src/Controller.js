@@ -56,6 +56,7 @@
 				$("#tries .value").text(this.tries = 1);
 				previousSeed = $("#seed").val();
 			}
+			this.view.update();
 		}, this));
 
 		//new board button:
@@ -77,16 +78,17 @@
 
 		//level selector:
 		$("#levels").click(_.bind(function() {
-			this.setupLevel(levels, levelSelector.selectedIndex);
 			this.level = levelSelector.selectedIndex;
-			$("#seed").val("level " + (this.level + 1));
-			$("#restart").click();
+			this.setupLevel(levels, this.level);
+
 			if(this.levelScores[this.level]) {
 				this.displayScore();
 			} else {
 				this.blankScore();
 			}
-			this.view.update();
+
+			$("#seed").val("level " + (this.level + 1));
+			$("#restart").click();
 		}, this));
 
 		//hidden next level button:
@@ -99,17 +101,7 @@
 			if(this.level < levelSelector.length) {
 				$("#" + (this.level + 1)).show();
 				levelSelector.selectedIndex = this.level;
-				this.setupLevel(levels, this.level);
-
-				if(this.levelScores[this.level]) {
-					this.displayScore();
-				} else {
-					this.blankScore();
-				}
-
-				$("#seed").val("level " + (this.level + 1));
-				$("#restart").click();
-				this.view.update();
+				$("#levels").click();
 			} else {
 				$("#message .value").text("Congratulations! You have finished the game!");
 			}
@@ -142,7 +134,7 @@
 				//show the next level button:
 				$("#nextLevel").show();
 			} else {
-				$("#message .value").text("You must save at least 70% of the forest!");
+				$("#message .value").text("You must save at least " + (100 - this.winPercent) + "% of the forest!");
 			}
 		}
 		this.view.update();
