@@ -78,17 +78,19 @@
 
 		//level selector:
 		$("#levels").click(_.bind(function() {
-			this.level = levelSelector.selectedIndex;
-			this.setupLevel(levels, this.level);
+			if(this.level !== levelSelector.selectedIndex) {
+				this.level = levelSelector.selectedIndex;
+				this.setupLevel(levels, this.level);
 
-			if(this.levelScores[this.level]) {
-				this.displayScore();
-			} else {
-				this.blankScore();
+				if(this.levelScores[this.level]) {
+					this.displayScore();
+				} else {
+					this.blankScore();
+				}
+
+				$("#seed").val("level " + (this.level + 1));
+				$("#restart").click();
 			}
-
-			$("#seed").val("level " + (this.level + 1));
-			$("#restart").click();
 		}, this));
 
 		//hidden next level button:
@@ -101,7 +103,16 @@
 			if(this.level < levelSelector.length) {
 				$("#" + (this.level + 1)).show();
 				levelSelector.selectedIndex = this.level;
-				$("#levels").click();
+				this.setupLevel(levels, this.level);
+
+				if(this.levelScores[this.level]) {
+					this.displayScore();
+				} else {
+					this.blankScore();
+				}
+
+				$("#seed").val("level " + (this.level + 1));
+				$("#restart").click();
 			} else {
 				$("#message .value").text("Congratulations! You have finished the game!");
 			}
