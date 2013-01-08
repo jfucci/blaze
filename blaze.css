@@ -1,0 +1,44 @@
+@import url('lib/bootstrap.css');
+
+h1, h2, h3, h4{
+	margin: 0px;
+}
+h1, h2, h3{
+	font-weight:normal;
+	font-family: 'HelveticaNeue-UltraLight',
+		'Helvetica Neue UltraLight',
+		'Helvetica Neue',
+		Arial, Helvetica, sans-serif;
+}
+h4{
+	font-weight:normal;
+	font-family: 'HelveticaNeue-Light',
+		'Helvetica Neue Light',
+		'Helvetica Neue',
+		Arial, Helvetica, sans-serif;
+}
+a{
+	font-family: 'HelveticaNeue',
+		'Helvetica Neue',
+		'Helvetica Neue',
+		Arial, Helvetica, sans-serif;
+}
+body, html, #canvas_wrap{
+	height:100%;
+}
+#canvas_wrap{
+	border: 1px solid #ddd;
+	margin: 10px;
+	float:left;
+}
+#controls{
+	float:left;
+	display:inline-block;
+}
+.stats div{
+	margin-bottom: 10px;
+}
+.value{
+	font-size: 24px;
+	clear:left;
+}
